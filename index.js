@@ -37,7 +37,13 @@ CreateFilePlugin.prototype.apply = function apply(compiler) {
     callback();
   };
 
-  compiler.plugin('after-emit', afterEmit);
+  if (compiler.hooks) {
+    const plugin = { name: 'CreateFilePlugin' };
+
+    compiler.hooks.afterEmit.tapAsync(plugin, afterEmit);
+  } else {
+    compiler.plugin('after-emit', afterEmit);
+  }
 };
 
 CreateFilePlugin['default'] = CreateFilePlugin;
