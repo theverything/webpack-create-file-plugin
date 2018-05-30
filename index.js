@@ -3,8 +3,8 @@ const fs = require('fs');
 const has = require('lodash.has');
 
 function createFile(file) {
-  return new Promise(function (resolve, reject) {
-    fs.writeFile(file, '', function (err) {
+  return new Promise(function(resolve, reject) {
+    fs.writeFile(file, '', function(err) {
       if (err) return reject(err);
       return resolve(true);
     });
@@ -26,19 +26,18 @@ CreateFilePlugin.prototype.apply = function apply(compiler) {
     throw new Error('output.path is not defined. Define output.path.');
   }
 
-  compiler.plugin('emit', (compilation, callback) => {
+  const afterEmit = (compilation, callback) => {
     if (this.files.length) {
-      return Promise.all(
-        this.files.map((file) => createFile(path.join(outputPath, file)))
-      )
-      .then(() => {
+      return Promise.all(this.files.map(file => createFile(path.join(outputPath, file)))).then(() => {
         this.files = [];
         callback();
       });
     }
 
     callback();
-  });
+  };
+
+  compiler.plugin('after-emit', afterEmit);
 };
 
 CreateFilePlugin['default'] = CreateFilePlugin;
